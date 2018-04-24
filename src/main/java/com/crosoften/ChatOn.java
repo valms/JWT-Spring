@@ -11,7 +11,6 @@ import java.util.Arrays;
 @SpringBootApplication
 public class ChatOn {
 	
-	
 	public static void main(String[] args) {
 		SpringApplication.run( ChatOn.class, args );
 	}
