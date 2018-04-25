@@ -21,3 +21,5 @@ buildNumber.properties
 out
 gen
 db/Database_CHATON.mwb.bak
+.DS_Store
+src/test/
