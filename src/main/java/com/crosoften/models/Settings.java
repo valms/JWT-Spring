@@ -1,6 +1,5 @@
 package com.crosoften.models;
 
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,20 +13,16 @@ import javax.persistence.Id;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Profile {
+public class Settings {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	private String nickname;
+	private boolean notifications;
 	
-	private String city;
+	private boolean agenda;
 	
-	private String gender;
-	
-	private boolean enableNotification;
-	
-	
+	private boolean camera;
 	
 }
