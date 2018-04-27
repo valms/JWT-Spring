@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -28,6 +25,13 @@ public class Profile {
 	
 	private boolean enableNotification;
 	
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
 	
+	private User user;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "settings_id", unique = true)
+	private Settings settings;
 	
 }
