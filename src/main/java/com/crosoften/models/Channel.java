@@ -1,5 +1,6 @@
 package com.crosoften.models;
 
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,22 +9,26 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
-@Entity
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-public class Settings extends AuditModel implements Serializable {
+@Entity
+public class Channel extends AuditModel implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	private boolean notifications;
+	@NotBlank
+	private boolean isOpen;
 	
-	private boolean agenda;
 	
-	private boolean camera;
+	private String description;
+	
+	
+	
 	
 }
