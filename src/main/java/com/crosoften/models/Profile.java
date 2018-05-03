@@ -1,14 +1,14 @@
 package com.crosoften.models;
 
 
+import com.crosoften.models.auth.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -20,20 +20,24 @@ public class Profile extends AuditModel implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@Size(max = 90)
 	private String nickname;
 	
+	@Size(max = 100)
 	private String city;
 	
-	private String gender;
+	@Enumerated(EnumType.STRING)
+	@Column(length = 10)
+	private Gender gender;
 	
 	private boolean enableNotification;
 	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	@MapsId
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "settings_id", unique = true)
-	private List<Settings> settings = new ArrayList<>();
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinColumn(name = "settings_id", nullable = false)
+	private Settings settings;
 	
 }
