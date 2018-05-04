@@ -1,6 +1,7 @@
 package com.crosoften.models;
 
 
+import com.crosoften.models.audit.AuditModel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

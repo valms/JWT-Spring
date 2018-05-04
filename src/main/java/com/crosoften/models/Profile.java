@@ -1,6 +1,7 @@
 package com.crosoften.models;
 
 
+import com.crosoften.models.audit.AuditModel;
 import com.crosoften.models.auth.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,8 +37,8 @@ public class Profile extends AuditModel implements Serializable {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
-	@OneToMany(fetch = FetchType.LAZY)
-	@JoinColumn(name = "settings_id", nullable = false)
-	private Settings settings;
+//	@OneToMany(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "settings_id", nullable = false)
+//	private Settings settings;
 	
 }

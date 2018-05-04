@@ -1,4 +1,4 @@
-package com.crosoften.models;
+package com.crosoften.models.audit;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;

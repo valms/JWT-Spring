@@ -3,7 +3,6 @@ package com.crosoften.controllers;
 
 import com.crosoften.models.auth.User;
 import com.crosoften.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,9 +14,10 @@ import javax.validation.Valid;
 @RequestMapping("/api")
 public class UserController {
 	
+	
 	private final UserRepository userRepository;
 	
-	@Autowired
+	
 	public UserController(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
@@ -26,9 +26,5 @@ public class UserController {
 	public User createUser(@Valid @RequestBody User user) {
 		return this.userRepository.save( user );
 	}
-	
-	
-	
-	
 	
 }
