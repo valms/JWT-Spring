@@ -23,7 +23,5 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 		LOGGER.error( "Responding with unauthorized error. Message - {}", e.getMessage() );
 		httpServletResponse.sendError( HttpServletResponse.SC_UNAUTHORIZED, "Sorry, You're not authorized to access this resource." );
 		
-		//TODO: PArei aqui -> https://www.callicoder.com/spring-boot-spring-security-jwt-mysql-react-app-part-2/#2-custom-spring-security-userdetails
-		
 	}
 }

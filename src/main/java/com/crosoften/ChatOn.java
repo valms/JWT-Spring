@@ -21,7 +21,8 @@ public class ChatOn {
 	
 	@PostConstruct
 	public void init() {
-		TimeZone.setDefault( TimeZone.getTimeZone( "America/Sao_Paulo" ) );
+		//@TODO: Arrumar esse timezone.
+		TimeZone.setDefault( TimeZone.getTimeZone( "UTC" ) );
 	}
 	
 	

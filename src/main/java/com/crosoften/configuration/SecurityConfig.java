@@ -6,7 +6,10 @@ import com.crosoften.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,8 +25,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
+	@Autowired
 	private CustomUserDetailsService customUserDetailsService;
-	private final JwtAuthenticationEntryPoint unauthorizedHandler;
+	
+	@Autowired
+	private JwtAuthenticationEntryPoint unauthorizedHandler;
 	
 	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -31,10 +37,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	
 	@Autowired
-	public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtAuthenticationEntryPoint authenticationEntryPoint) {
-		this.customUserDetailsService = customUserDetailsService;
-		this.unauthorizedHandler = unauthorizedHandler;
-	}
+//	public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtAuthenticationEntryPoint authenticationEntryPoint) {
+//		this.customUserDetailsService = customUserDetailsService;
+//		this.unauthorizedHandler = authenticationEntryPoint;
+//	}
 	
 	@Override
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -66,5 +72,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers( HttpMethod.GET, "/api/polls/**", "/api/users/**" ).permitAll()
 			.anyRequest().authenticated();
 		http.addFilterBefore( jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class );
+	}
+	
+	@Bean(BeanIds.AUTHENTICATION_MANAGER)
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+	
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+		return new PropertySourcesPlaceholderConfigurer();
 	}
 }
