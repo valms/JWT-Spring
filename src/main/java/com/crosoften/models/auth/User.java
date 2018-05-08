@@ -19,6 +19,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
 public class User extends AuditModel implements Serializable {
 	
 	@Id

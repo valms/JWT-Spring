@@ -8,6 +8,8 @@ import com.crosoften.models.auth.Role;
 import com.crosoften.models.auth.RoleName;
 import com.crosoften.models.auth.User;
 import com.crosoften.payload.ApiResponse;
+import com.crosoften.payload.JwtAuthenticationResponse;
+import com.crosoften.payload.LoginRequest;
 import com.crosoften.payload.SignUpRequest;
 import com.crosoften.repositories.RoleRepository;
 import com.crosoften.repositories.UserRepository;
@@ -16,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,9 +78,10 @@ public class AuthController {
 		profile.setGender( userGender );
 		profile.setCity( signUpRequest.getCity() );
 		profile.setNickname( signUpRequest.getNickname() );
-		profile.setEnableNotification( signUpRequest.getEnableNotification() );
+		profile.setEnableNotification( signUpRequest.isEnableNotification() );
 		
 		user.setProfile( profile );
+		profile.setUser( user );
 		
 		User result = this.userRepository.save( user );
 		
@@ -86,4 +92,20 @@ public class AuthController {
 		return ResponseEntity.created( location ).body( new ApiResponse( true, "Usuário Criado com sucesso" ) );
 		
 	}
+	
+	
+	@PostMapping("/signin")
+	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+		
+		Authentication authentication = this.authenticationManager.authenticate( new UsernamePasswordAuthenticationToken( loginRequest.getEmail(), loginRequest.getPassword() ) );
+		
+		SecurityContextHolder.getContext().setAuthentication( authentication );
+		
+		String jwtToken = this.jwtTokenProvider.generateToken( authentication );
+		
+		return ResponseEntity.ok( new JwtAuthenticationResponse( jwtToken ) );
+		
+	}
+	
+	
 }

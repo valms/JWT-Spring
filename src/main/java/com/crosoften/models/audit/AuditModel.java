@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
 
 @MappedSuperclass
@@ -24,15 +24,13 @@ import java.util.Date;
 @Setter
 public class AuditModel implements Serializable {
 	
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "created_at", nullable = false)
+	@Column(nullable = false)
 	@CreatedDate
-	private Date createdAt;
+	private Instant createdAt;
 	
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "updated_at", nullable = false)
+	@Column(nullable = false)
 	@LastModifiedDate
-	private Date updatedAt;
+	private Instant updatedAt;
 	
 	
 }
