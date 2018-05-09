@@ -34,15 +34,22 @@ public class UserController {
 	
 	@GetMapping("/user/me")
 	@PreAuthorize("hasRole('USER')")
-	public UserSummary getCurrenłtUser(@CurrentLoggedUser UserPrincipal currentUser) {
+	public UserSummary getCurrentUser(@CurrentLoggedUser UserPrincipal currentUser) {
 		Optional<Profile> profile = this.profileRepository.findByUserId( currentUser.getId() );
-		UserSummary userSummary = new UserSummary();
-		userSummary.setId( currentUser.getId() );
-		userSummary.setEmail( currentUser.getEmail() );
-		userSummary.setNickname( profile.get().getNickname() );
-		userSummary.setCity( profile.get().getCity() );
-		userSummary.setGender( Gender.valueOf( profile.get().getGender().name() ) );
 		
-		return userSummary;
+		if (profile.isPresent()) {
+			UserSummary userSummary = new UserSummary();
+			userSummary.setId( currentUser.getId() );
+			userSummary.setEmail( currentUser.getEmail() );
+			userSummary.setNickname( profile.get().getNickname() );
+			userSummary.setCity( profile.get().getCity() );
+			userSummary.setGender( Gender.valueOf( profile.get().getGender().name() ) );
+			return userSummary;
+		}
+		
+		//TODO: Tratamento
+		return null;
+		
+		
 	}
 }
