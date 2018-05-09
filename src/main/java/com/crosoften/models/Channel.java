@@ -1,33 +1,28 @@
 package com.crosoften.models;
 
 
-import com.crosoften.models.audit.AuditModel;
+import com.crosoften.models.audit.UserAuditModel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
+import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-public class Channel extends AuditModel implements Serializable {
+public class Channel extends UserAuditModel {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@NotBlank
+	@NotNull
 	private boolean isOpen;
 	
 	@Lob
 	private String description;
-	
-	
-	
-	
-	
+
 }

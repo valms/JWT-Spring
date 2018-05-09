@@ -1,4 +1,4 @@
-package com.crosoften.payload;
+package com.crosoften.payload.response;
 
 
 import lombok.Data;

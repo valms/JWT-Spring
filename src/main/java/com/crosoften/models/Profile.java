@@ -10,6 +10,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -36,9 +38,5 @@ public class Profile extends AuditModel implements Serializable {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
-	
-//	@OneToMany(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "settings_id", nullable = false)
-//	private Settings settings;
-	
+
 }

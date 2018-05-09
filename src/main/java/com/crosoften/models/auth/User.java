@@ -1,5 +1,6 @@
 package com.crosoften.models.auth;
 
+import com.crosoften.models.Channel;
 import com.crosoften.models.Profile;
 import com.crosoften.models.audit.AuditModel;
 import lombok.Getter;
@@ -20,7 +21,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"email"}))
-public class User extends AuditModel implements Serializable {
+public class User extends AuditModel {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +47,5 @@ public class User extends AuditModel implements Serializable {
 	
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
 	private Profile profile;
-	
 	
 }
