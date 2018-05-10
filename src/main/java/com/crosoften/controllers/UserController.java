@@ -1,8 +1,12 @@
 package com.crosoften.controllers;
 
 
+import com.crosoften.exception.ResourceNotFoundException;
 import com.crosoften.models.Gender;
 import com.crosoften.models.Profile;
+import com.crosoften.payload.response.PagedResponse;
+import com.crosoften.payload.response.UserIdentityAvailability;
+import com.crosoften.payload.response.UserProfile;
 import com.crosoften.payload.response.UserSummary;
 import com.crosoften.repositories.ProfileRepository;
 import com.crosoften.repositories.UserRepository;
@@ -11,10 +15,10 @@ import com.crosoften.security.UserPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 import java.util.Optional;
 
 @RestController
@@ -50,6 +54,25 @@ public class UserController {
 		//TODO: Tratamento
 		return null;
 		
-		
 	}
+	
+	@GetMapping("/user/checkNickname")
+	public UserIdentityAvailability checkNicknameAvailability(@RequestParam(value = "nickname") String nickname) {
+		return new UserIdentityAvailability( !this.profileRepository.existsByNickname( nickname ) );
+	}
+	
+	@GetMapping("/user/checkEmail")
+	public UserIdentityAvailability checkEmailAvailability(@RequestParam(value = "email") String email) {
+		return new UserIdentityAvailability( !this.userRepository.existsByEmail( email ) );
+	}
+	
+	@GetMapping("/users/{nickname}")
+	public UserProfile getUserProfile(@PathVariable(value = "nickname") String nickname) {
+		Optional<Profile> profile = Optional.of( this.profileRepository.findByNickname( nickname ).orElseThrow( () -> new ResourceNotFoundException( "Perfil", "nickname", nickname ) ) );
+		
+		return new UserProfile( profile.get().getNickname(), profile.get().getUser().getEmail(), profile.get().getUser().getCreatedAt() );
+	}
+	
+//	public PagedResponse<Channel>
+	
 }
