@@ -1,10 +1,20 @@
 package com.crosoften.payload.response;
 
-import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ChannelResponse {
+	
+	private String channelName;
+	private String channelDescription;
 
-//	private String channelName;
-//	private List<>
-//
+	
+	public ChannelResponse(String channelName, String channelDescription) {
+		this.channelName = channelName;
+		this.channelDescription = channelDescription;
+	}
+	
 }

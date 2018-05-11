@@ -4,14 +4,12 @@ package com.crosoften.controllers;
 import com.crosoften.exception.ResourceNotFoundException;
 import com.crosoften.models.Gender;
 import com.crosoften.models.Profile;
-import com.crosoften.payload.response.PagedResponse;
-import com.crosoften.payload.response.UserIdentityAvailability;
-import com.crosoften.payload.response.UserProfile;
-import com.crosoften.payload.response.UserSummary;
+import com.crosoften.payload.response.*;
 import com.crosoften.repositories.ProfileRepository;
 import com.crosoften.repositories.UserRepository;
 import com.crosoften.security.CurrentLoggedUser;
 import com.crosoften.security.UserPrincipal;
+import com.crosoften.util.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -73,6 +71,12 @@ public class UserController {
 		return new UserProfile( profile.get().getNickname(), profile.get().getUser().getEmail(), profile.get().getUser().getCreatedAt() );
 	}
 	
-//	public PagedResponse<Channel>
+	@GetMapping("/users/{nickname}/channels")
+	public PagedResponse<ChannelResponse> getChannelsCreatedBy(
+		@PathVariable(value = "nickname") String nickname, @CurrentLoggedUser UserPrincipal currentUser, @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page, @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
+		
+		
+		return null;
+	}
 	
 }
