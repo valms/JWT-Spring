@@ -11,6 +11,7 @@ import com.crosoften.payload.response.ApiResponse;
 import com.crosoften.payload.response.JwtAuthenticationResponse;
 import com.crosoften.payload.request.LoginRequest;
 import com.crosoften.payload.request.SignUpRequest;
+import com.crosoften.repositories.ProfileRepository;
 import com.crosoften.repositories.RoleRepository;
 import com.crosoften.repositories.UserRepository;
 import com.crosoften.security.JwtTokenProvider;
@@ -41,15 +42,16 @@ public class AuthController {
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
-	
+	private final ProfileRepository profileRepository;
 	private final JwtTokenProvider jwtTokenProvider;
 	
 	
 	@Autowired
-	public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
+	public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, ProfileRepository profileRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
 		this.authenticationManager = authenticationManager;
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
+		this.profileRepository = profileRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtTokenProvider = jwtTokenProvider;
 	}
@@ -58,6 +60,10 @@ public class AuthController {
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
 		if (this.userRepository.existsByEmail( signUpRequest.getEmail() )) {
 			return new ResponseEntity<>( new ApiResponse( false, "E-mail já cadastrado" ), HttpStatus.BAD_REQUEST );
+		}
+		
+		if (this.profileRepository.existsByNickname( signUpRequest.getNickname() )) {
+			return new ResponseEntity<>( new ApiResponse( false, "Nickname já cadastrado" ), HttpStatus.BAD_REQUEST );
 		}
 		
 		// Criando Usuáruo

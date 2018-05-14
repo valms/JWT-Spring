@@ -2,21 +2,23 @@ package com.crosoften.controllers;
 
 
 import com.crosoften.exception.ResourceNotFoundException;
+import com.crosoften.models.Channel;
 import com.crosoften.models.Gender;
 import com.crosoften.models.Profile;
 import com.crosoften.payload.response.*;
+import com.crosoften.repositories.ChannelRepository;
 import com.crosoften.repositories.ProfileRepository;
 import com.crosoften.repositories.UserRepository;
 import com.crosoften.security.CurrentLoggedUser;
 import com.crosoften.security.UserPrincipal;
-import com.crosoften.util.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.websocket.server.PathParam;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -27,11 +29,13 @@ public class UserController {
 	
 	private final UserRepository userRepository;
 	private final ProfileRepository profileRepository;
+	private final ChannelRepository channelRepository;
 	
 	
-	public UserController(UserRepository userRepository, ProfileRepository profileRepository) {
+	public UserController(UserRepository userRepository, ProfileRepository profileRepository, ChannelRepository channelRepository) {
 		this.userRepository = userRepository;
 		this.profileRepository = profileRepository;
+		this.channelRepository = channelRepository;
 	}
 	
 	@GetMapping("/user/me")
@@ -71,12 +75,13 @@ public class UserController {
 		return new UserProfile( profile.get().getNickname(), profile.get().getUser().getEmail(), profile.get().getUser().getCreatedAt() );
 	}
 	
-	@GetMapping("/users/{nickname}/channels")
-	public PagedResponse<ChannelResponse> getChannelsCreatedBy(
-		@PathVariable(value = "nickname") String nickname, @CurrentLoggedUser UserPrincipal currentUser, @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page, @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
+	@GetMapping("/users/my_channels")
+	public List<Channel> getChannelsCreatedBy(@CurrentLoggedUser UserPrincipal currentUser) {
+//		Optional<Profile> profile = Optional.of( this.profileRepository.findByUserId( currentUser.getId() ).orElseThrow( () -> new ResourceNotFoundException( "Usuário", "e-mail", currentUser.getEmail() ) ) );
+//		Optional<Channel> channel = Optional.of(  );
 		
-		
-		return null;
+		//TOFIX: Retorno como lista
+		return Collections.singletonList( this.channelRepository.findByCreatedBy( currentUser.getId() ).orElseThrow( () -> new ResourceNotFoundException( "Canal", "usuário", currentUser.getEmail() ) ) );
 	}
 	
 }

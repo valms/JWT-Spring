@@ -4,7 +4,6 @@ import com.crosoften.models.audit.AuditModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import sun.jvm.hotspot.debugger.cdbg.basic.LazyBlockSym;
 
 import javax.persistence.*;
 

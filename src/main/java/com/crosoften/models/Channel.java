@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @NoArgsConstructor
 @Getter
@@ -22,7 +23,10 @@ public class Channel extends UserAuditModel {
 	@NotNull
 	private boolean isOpen;
 	
-	@Lob
+	@Size(min = 4, max = 90)
+	private String name;
+	
+	@Column(columnDefinition = "text")
 	private String description;
-
+	
 }
