@@ -1,6 +1,7 @@
 package com.crosoften.controllers;
 
 
+import com.crosoften.exception.BadRequestException;
 import com.crosoften.exception.ResourceNotFoundException;
 import com.crosoften.models.Channel;
 import com.crosoften.models.Gender;
@@ -16,10 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -31,7 +29,6 @@ public class UserController {
 	private final ProfileRepository profileRepository;
 	private final ChannelRepository channelRepository;
 	
-	
 	public UserController(UserRepository userRepository, ProfileRepository profileRepository, ChannelRepository channelRepository) {
 		this.userRepository = userRepository;
 		this.profileRepository = profileRepository;
@@ -41,21 +38,8 @@ public class UserController {
 	@GetMapping("/user/me")
 	@PreAuthorize("hasRole('USER')")
 	public UserSummary getCurrentUser(@CurrentLoggedUser UserPrincipal currentUser) {
-		Optional<Profile> profile = this.profileRepository.findByUserId( currentUser.getId() );
-		
-		if (profile.isPresent()) {
-			UserSummary userSummary = new UserSummary();
-			userSummary.setId( currentUser.getId() );
-			userSummary.setEmail( currentUser.getEmail() );
-			userSummary.setNickname( profile.get().getNickname() );
-			userSummary.setCity( profile.get().getCity() );
-			userSummary.setGender( Gender.valueOf( profile.get().getGender().name() ) );
-			return userSummary;
-		}
-		
-		//TODO: Tratamento
-		return null;
-		
+		Optional<Profile> profile = Optional.of( this.profileRepository.findByUserId( currentUser.getId() ).orElseThrow( () -> new ResourceNotFoundException( "Usuário", "email", currentUser.getEmail() ) ) );
+		return new UserSummary( currentUser.getId(), currentUser.getEmail(), profile.get().getNickname(), profile.get().getCity(), Gender.valueOf( profile.get().getGender().name() ) );
 	}
 	
 	@GetMapping("/user/checkNickname")
@@ -71,17 +55,26 @@ public class UserController {
 	@GetMapping("/users/{nickname}")
 	public UserProfile getUserProfile(@PathVariable(value = "nickname") String nickname) {
 		Optional<Profile> profile = Optional.of( this.profileRepository.findByNickname( nickname ).orElseThrow( () -> new ResourceNotFoundException( "Perfil", "nickname", nickname ) ) );
-		
 		return new UserProfile( profile.get().getNickname(), profile.get().getUser().getEmail(), profile.get().getUser().getCreatedAt() );
 	}
 	
 	@GetMapping("/users/my_channels")
-	public List<Channel> getChannelsCreatedBy(@CurrentLoggedUser UserPrincipal currentUser) {
-//		Optional<Profile> profile = Optional.of( this.profileRepository.findByUserId( currentUser.getId() ).orElseThrow( () -> new ResourceNotFoundException( "Usuário", "e-mail", currentUser.getEmail() ) ) );
-//		Optional<Channel> channel = Optional.of(  );
+	public List getChannelsCreatedBy(@CurrentLoggedUser UserPrincipal currentUser) {
 		
-		//TOFIX: Retorno como lista
-		return Collections.singletonList( this.channelRepository.findByCreatedBy( currentUser.getId() ).orElseThrow( () -> new ResourceNotFoundException( "Canal", "usuário", currentUser.getEmail() ) ) );
+		List<ChannelResponse> channelResponses = new ArrayList<>();
+		List<Channel> channels = this.channelRepository.findAllByCreatedBy( currentUser.getId() );
+		
+		if (channels.isEmpty()) {
+			throw new BadRequestException( "Usuário não tem canais criados" );
+		}
+		
+		for (Channel channel : channels) {
+			ChannelResponse channelResponse = new ChannelResponse( channel.getId(), channel.getName(), channel.getDescription(), channel.isOpen() );
+			channelResponses.add( channelResponse );
+		}
+		
+		return channelResponses;
+		
 	}
 	
 }

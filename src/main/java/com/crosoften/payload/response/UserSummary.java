@@ -14,5 +14,11 @@ public class UserSummary {
 	private String city;
 	private Gender gender;
 	
-	
+	public UserSummary(Long id, String nickname, String email, String city, Gender gender) {
+		this.id = id;
+		this.nickname = nickname;
+		this.email = email;
+		this.city = city;
+		this.gender = gender;
+	}
 }

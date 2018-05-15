@@ -12,7 +12,7 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 @Getter
 @Setter
-@JsonIgnoreProperties(value = {"creattedBy", "updatedBy"},
+@JsonIgnoreProperties(value = {"createdBy", "updatedBy"},
 	allowGetters = true)
 public class UserAuditModel extends AuditModel {
 	
