@@ -4,9 +4,9 @@ package com.crosoften.controllers;
 import com.crosoften.exception.BadRequestException;
 import com.crosoften.exception.ResourceNotFoundException;
 import com.crosoften.models.*;
-import com.crosoften.models.auth.User;
 import com.crosoften.payload.request.ChannelRequest;
 import com.crosoften.payload.request.FavoriteChannelRequest;
+import com.crosoften.payload.request.PedentUser;
 import com.crosoften.payload.response.ApiResponse;
 import com.crosoften.payload.response.ChannelResponse;
 import com.crosoften.payload.response.UserSummary;
@@ -19,14 +19,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.metamodel.ListAttribute;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/channel/")
+@RequestMapping("/api/channel")
 public class ChannelController {
 	
 	private final ChannelRepository channelRepository;
@@ -89,7 +88,7 @@ public class ChannelController {
 		return channelResponses;
 	}
 	
-	@PostMapping("subscribe_channel")
+	@PostMapping("/subscribe_channel")
 	public ResponseEntity<?> subscribeAtChannel(@CurrentLoggedUser UserPrincipal loggedUser, @Valid @RequestBody FavoriteChannelRequest favoriteChannelRequest) {
 		Optional<Profile> profile = Optional.of( this.profileRepository.findByUserId( loggedUser.getId() ).orElseThrow( () -> new ResourceNotFoundException( "Usuário", "email", loggedUser.getEmail() ) ) );
 		Optional<Channel> channel = Optional.of( this.channelRepository.findById( favoriteChannelRequest.getChannelId() ).orElseThrow( () -> new ResourceNotFoundException( "Canal", "id", favoriteChannelRequest.getChannelId() ) ) );
@@ -147,30 +146,54 @@ public class ChannelController {
 		return channelResponses;
 	}
 	
-	
-	@PostMapping("/favorite_channel")
-	public ResponseEntity<?> acceptUser(@CurrentLoggedUser UserPrincipal loggedUser) {
+	@PostMapping("/{channelId}/accept_or_refuse_user")
+	public ResponseEntity<?> acceptUser(@CurrentLoggedUser UserPrincipal loggedUser, @PathVariable(value = "channelId") Long channelId, @Valid @RequestBody PedentUser pedentUser) {
+		Optional<Profile> currentUser = Optional.of( this.profileRepository.findByUserId( loggedUser.getId() ).orElseThrow( () -> new ResourceNotFoundException( "Usuário", "email", loggedUser.getEmail() ) ) );
+		Optional<Channel> channel = Optional.of( this.channelRepository.findById( channelId ).orElseThrow( () -> new ResourceNotFoundException( "Canal", "id", channelId ) ) );
+		Optional<ProfileChannel> profileChannel = Optional.of( this.profileChannelRepository.findByProfileAndChannel( currentUser.get(), channel.get() ).orElseThrow( () -> new ResourceNotFoundException( "Perfil não faz parte do canal", "id", channelId ) ) );
 		
-		return null;
+		
+		if (!profileChannel.get().isModerator())
+			throw new BadRequestException( "Sem permissão! Usuário não tem acesso como moderador." );
+		
+		
+		Optional<Profile> pedentProfile = Optional.of( this.profileRepository.findById( pedentUser.getUserId() ).orElseThrow( () -> new ResourceNotFoundException( "Perfil", "id", pedentUser.getUserId() ) ) );
+		Optional<WaitlistChannel> pedentUserOnChannel = Optional.of( this.waitlistRepository.findByChannelAndProfile( channel.get(), pedentProfile.get() ).orElseThrow( () -> new BadRequestException( "Perfil inválido" ) ) );
+		
+		
+		if (pedentUser.isApproved()) {
+			ProfileChannel acceptedUser = new ProfileChannel( false, pedentProfile.get(), channel.get() );
+			this.profileChannelRepository.save( acceptedUser );
+			this.waitlistRepository.delete( pedentUserOnChannel.get() );
+			
+			return new ResponseEntity<>( new ApiResponse( true, "Usuário aceito com sucesso!" ), HttpStatus.OK );
+		} else {
+			this.waitlistRepository.delete( pedentUserOnChannel.get() );
+			return new ResponseEntity<>( new ApiResponse( true, "Usuário recusado com sucesso!" ), HttpStatus.OK );
+		}
+		
 	}
 	
-	
-	@PostMapping("/list_pedents_users/{channelId}")
+	@GetMapping("/list_pedents_users/{channelId}")
 	public List listPedentUsers(@CurrentLoggedUser UserPrincipal loggedUser, @PathVariable(value = "channelId") Long channelId) {
 		Optional<Profile> profile = Optional.of( this.profileRepository.findByUserId( loggedUser.getId() ).orElseThrow( () -> new ResourceNotFoundException( "Usuário", "email", loggedUser.getEmail() ) ) );
 		Optional<Channel> channel = Optional.of( this.channelRepository.findById( channelId ).orElseThrow( () -> new ResourceNotFoundException( "Canal", "id", channelId ) ) );
 		
-		Optional<ProfileChannel> profileChannel = Optional.of( this.profileChannelRepository.findByChannelId( channelId ).orElseThrow( () -> new ResourceNotFoundException( "Canal", "id", channelId ) ) );
+		Optional<ProfileChannel> profileChannel = Optional.of( this.profileChannelRepository.findByProfileAndChannel( profile.get(), channel.get() ).orElseThrow( () -> new ResourceNotFoundException( "Perfil não faz parte do canal", "id", channelId ) ) );
 		
-		if (profile.get().getId().equals( profileChannel.get().getProfile().getId() ) && !profileChannel.get().isModerator())
-			
-			return null;
-	}
-	
-	@PostMapping("/refuse_user/{channelID}/{userID}")
-	public ResponseEntity<?> refuseUser(@CurrentLoggedUser UserPrincipal loggedUser) {
+		if (!profileChannel.get().isModerator())
+			throw new BadRequestException( "Usuário não tem acesso como moderador" );
 		
-		return null;
+		List<UserSummary> userSummaries = new ArrayList<>();
+		
+		for (WaitlistChannel waitlistChannel : this.waitlistRepository.findAllByChannel( channel.get() )) {
+			Optional<Profile> user = Optional.of( this.profileRepository.findById( waitlistChannel.getProfile().getId() ).orElseThrow( () -> new ResourceNotFoundException( "Usuário não encontrado",
+				"nickname", waitlistChannel.getProfile().getNickname() ) ) );
+			UserSummary userSummary = new UserSummary( user.get().getId(), user.get().getNickname(), user.get().getUser().getEmail(), user.get().getCity(), user.get().getGender() );
+			userSummaries.add( userSummary );
+		}
+		
+		return userSummaries;
 	}
 	
 	

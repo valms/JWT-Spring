@@ -2,9 +2,12 @@ package com.crosoften.models;
 
 import com.crosoften.models.audit.AuditModel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
 
 import javax.persistence.*;
 
+@Entity
+@Getter
 public class WaitlistChannel extends AuditModel {
 	
 	@Id

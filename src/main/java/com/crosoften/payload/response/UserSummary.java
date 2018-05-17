@@ -21,4 +21,9 @@ public class UserSummary {
 		this.city = city;
 		this.gender = gender;
 	}
+	
+	public UserSummary(Long id, String nickname) {
+		this.id = id;
+		this.nickname = nickname;
+	}
 }

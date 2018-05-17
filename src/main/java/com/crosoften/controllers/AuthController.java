@@ -11,10 +11,12 @@ import com.crosoften.payload.response.ApiResponse;
 import com.crosoften.payload.response.JwtAuthenticationResponse;
 import com.crosoften.payload.request.LoginRequest;
 import com.crosoften.payload.request.SignUpRequest;
+import com.crosoften.payload.response.UploadFileResponse;
 import com.crosoften.repositories.ProfileRepository;
 import com.crosoften.repositories.RoleRepository;
 import com.crosoften.repositories.UserRepository;
 import com.crosoften.security.JwtTokenProvider;
+import com.crosoften.services.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,15 +25,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -44,16 +46,18 @@ public class AuthController {
 	private final PasswordEncoder passwordEncoder;
 	private final ProfileRepository profileRepository;
 	private final JwtTokenProvider jwtTokenProvider;
+	private final FileStorageService fileStorageService;
 	
 	
 	@Autowired
-	public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, ProfileRepository profileRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
+	public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, RoleRepository roleRepository, ProfileRepository profileRepository, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider, FileStorageService fileStorageService) {
 		this.authenticationManager = authenticationManager;
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
 		this.profileRepository = profileRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtTokenProvider = jwtTokenProvider;
+		this.fileStorageService = fileStorageService;
 	}
 	
 	@PostMapping("/signup")
@@ -66,7 +70,7 @@ public class AuthController {
 			return new ResponseEntity<>( new ApiResponse( false, "Nickname já cadastrado" ), HttpStatus.BAD_REQUEST );
 		}
 		
-		// Criando Usuáruo
+		// Criando Usuário
 		
 		User user = new User();
 		user.setEmail( signUpRequest.getEmail() );
@@ -88,6 +92,9 @@ public class AuthController {
 		
 		user.setProfile( profile );
 		profile.setUser( user );
+		
+		//TODO: Arrumar Files e implementar Chat
+//		Arrays.stream( files ).map( file -> uploadFile( file, profile ) ).collect( Collectors.toList() );
 		
 		User result = this.userRepository.save( user );
 		
@@ -111,6 +118,13 @@ public class AuthController {
 		
 		return ResponseEntity.ok( new JwtAuthenticationResponse( jwtToken ) );
 		
+	}
+	
+	private UploadFileResponse uploadFile(MultipartFile file, Profile profile) {
+		String fileName = this.fileStorageService.storeFile( file );
+		String uriDownload = ServletUriComponentsBuilder.fromCurrentContextPath().path( "/downloadFile/" ).path( fileName ).toUriString();
+		
+		return new UploadFileResponse( fileName, uriDownload, file.getContentType(), file.getSize() );
 	}
 	
 	

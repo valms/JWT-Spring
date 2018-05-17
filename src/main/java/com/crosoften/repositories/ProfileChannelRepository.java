@@ -14,8 +14,10 @@ public interface ProfileChannelRepository extends JpaRepository<ProfileChannel, 
 	
 	boolean existsByProfileAndChannel(Profile profile, Channel channel);
 	
-	Optional<ProfileChannel> findByChannelId(Long channelId);
+	Optional<ProfileChannel> findByChannelId(Channel channel);
 	
+	Optional<ProfileChannel> findByProfileAndChannel(Profile profile, Channel channel);
+
 //	Boolean existsBy
 
 	
