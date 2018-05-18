@@ -7,10 +7,10 @@ import com.crosoften.models.Profile;
 import com.crosoften.models.auth.Role;
 import com.crosoften.models.auth.RoleName;
 import com.crosoften.models.auth.User;
-import com.crosoften.payload.response.ApiResponse;
-import com.crosoften.payload.response.JwtAuthenticationResponse;
 import com.crosoften.payload.request.LoginRequest;
 import com.crosoften.payload.request.SignUpRequest;
+import com.crosoften.payload.response.ApiResponse;
+import com.crosoften.payload.response.JwtAuthenticationResponse;
 import com.crosoften.payload.response.UploadFileResponse;
 import com.crosoften.repositories.ProfileRepository;
 import com.crosoften.repositories.RoleRepository;
@@ -25,15 +25,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")

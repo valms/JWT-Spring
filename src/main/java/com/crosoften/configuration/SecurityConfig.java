@@ -60,10 +60,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.authorizeRequests()
 			.antMatchers( "/",
 				"/favicon.ico",
+				"/swagger-resources/**",
+				"/v2/**",
+				"/swagger-ui.html",
 				"/**/*.png",
 				"/**/*.gif",
 				"/**/*.svg",
 				"/**/*.jpg",
+				"/**/*.ttf",
 				"/**/*.html",
 				"/**/*.css",
 				"/**/*.js" ).permitAll()
