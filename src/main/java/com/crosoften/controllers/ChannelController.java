@@ -46,9 +46,9 @@ public class ChannelController {
     /**
      * Cria um canal (grupo) para outros usuários ingressarem
      *
-     * @param currentUser
-     * @param channelRequest
-     * @return
+     * @param currentUser    Consome o token JWT para buscar o usuário autor da requisição
+     * @param channelRequest Request com os dados necessários para criação do canal
+     * @return em caso de sucesso, cria um novo canal
      */
     @PostMapping("/create_channel")
     public ResponseEntity<?> createChannel(@CurrentLoggedUser UserPrincipal currentUser, @Valid @RequestBody ChannelRequest channelRequest) {
@@ -78,6 +78,11 @@ public class ChannelController {
 
     }
 
+    /**
+     * Lista todos os canais criados (Necessário estar autenticado)
+     *
+     * @return retorna uma lista com os canais criados
+     */
     @GetMapping("/list_channels")
     public List<ChannelResponse> listAllChannels() {
 
@@ -95,6 +100,13 @@ public class ChannelController {
         return channelResponses;
     }
 
+    /**
+     * Entra em um canal já criado
+     *
+     * @param loggedUser             Consome o token JWT para buscar o usuário autor da requisição
+     * @param favoriteChannelRequest id do canal
+     * @return
+     */
     @PostMapping("/subscribe_channel")
     public ResponseEntity<?> subscribeAtChannel(@CurrentLoggedUser UserPrincipal loggedUser, @Valid @RequestBody FavoriteChannelRequest favoriteChannelRequest) {
         Optional<Profile> profile = Optional.of(this.profileRepository.findByUserId(loggedUser.getId()).orElseThrow(() -> new ResourceNotFoundException("Usuário", "email", loggedUser.getEmail())));
@@ -119,6 +131,13 @@ public class ChannelController {
         return new ResponseEntity<>(new ApiResponse(true, "Solicitação enviada com sucesso!"), HttpStatus.OK);
     }
 
+    /**
+     * O usuáriologado favorita o canal passado
+     *
+     * @param loggedUser             Consome o token JWT para buscar o usuário autor da requisição
+     * @param favoriteChannelRequest id do canal
+     * @return se sucesso, retorna o canal favoritado (Response: 200)
+     */
     @PostMapping("/favorite_channel")
     public ResponseEntity<?> favoriteChannel(@CurrentLoggedUser UserPrincipal loggedUser, @Valid @RequestBody FavoriteChannelRequest favoriteChannelRequest) {
 
@@ -138,6 +157,12 @@ public class ChannelController {
 
     }
 
+    /**
+     * Lista todos os canais que o usuário favoritou
+     *
+     * @param userPrincipal Consome o token JWT para buscar o usuário autor da requisição
+     * @return caso bem sucedido, retorna a lista dos canais favoritados (Response: 200)
+     */
     @GetMapping("/my_favorite_channels")
     public List<ChannelResponse> listFavoriteChannels(@CurrentLoggedUser UserPrincipal userPrincipal) {
         Optional<Profile> profile = Optional.of(this.profileRepository.findByUserId(userPrincipal.getId()).orElseThrow(() -> new ResourceNotFoundException("Usuário", "email", userPrincipal.getEmail())));
@@ -153,6 +178,14 @@ public class ChannelController {
         return channelResponses;
     }
 
+    /**
+     * Aceita ou recusa o usuário em canais fechados
+     *
+     * @param loggedUser O usuário atual (Token JWT) - Tem q ser moderador do canal
+     * @param channelId  id do canal
+     * @param pedentUser id do usuario
+     * @return retorna 200 e a condição solicitada (Aprovado ou Reprovado)
+     */
     @PostMapping("/{channelId}/accept_or_refuse_user")
     public ResponseEntity<?> acceptUser(@CurrentLoggedUser UserPrincipal loggedUser, @PathVariable(value = "channelId") Long channelId, @Valid @RequestBody PedentUser pedentUser) {
         Optional<Profile> currentUser = Optional.of(this.profileRepository.findByUserId(loggedUser.getId()).orElseThrow(() -> new ResourceNotFoundException("Usuário", "email", loggedUser.getEmail())));
