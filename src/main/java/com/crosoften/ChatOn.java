@@ -32,7 +32,6 @@ public class ChatOn extends SpringBootServletInitializer {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 
-
     public static void main(String[] args) {
         SpringApplication.run(ChatOn.class, args);
     }
