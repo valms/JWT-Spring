@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Images extends AuditModel implements Serializable {
+public class Images extends AuditModel {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

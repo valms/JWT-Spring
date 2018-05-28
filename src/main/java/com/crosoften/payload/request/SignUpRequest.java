@@ -1,6 +1,7 @@
 package com.crosoften.payload.request;
 
 import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -53,5 +54,8 @@ public class SignUpRequest {
      */
     @NotNull
     private boolean enableNotification;
+
+
+    private MultipartFile[] file;
 
 }

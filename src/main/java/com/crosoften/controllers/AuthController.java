@@ -34,7 +34,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -99,7 +101,11 @@ public class AuthController {
         profile.setUser(user);
 
         //TODO: Arrumar Files e implementar Chat
-//		Arrays.stream( files ).map( file -> uploadFile( file, profile ) ).collect( Collectors.toList() );
+
+        if (signUpRequest.getFile() != null) {
+            Arrays.stream(signUpRequest.getFile()).map(file -> uploadFile(file, profile)).collect(Collectors.toList());
+        }
+
 
         User result = this.userRepository.save(user);
 
